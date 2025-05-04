@@ -60,7 +60,7 @@ const AdminSidebar = () => {
               }`
             }
           >
-            <BlogIcon /> Blogs
+            <BlogIcon /> News
           </NavLink>
           <NavLink
             to={'/admin/comments'}

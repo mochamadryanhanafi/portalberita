@@ -300,10 +300,10 @@ export default function DetailsPage() {
         
         <div className="container mx-auto flex flex-col space-y-2 px-4 py-6 dark:text-white">
           <div className="flex justify-between text-2xl font-semibold ">
-            <div>Related Blogs</div>
+            <div>Related News</div>
             <div className="flex cursor-pointer items-center text-sm text-gray-400 hover:underline sm:mr-10">
               <Link to="/">
-                <div>see more blogs</div>
+                <div>see more News</div>
               </Link>
               <img
                 alt="arrow-right"

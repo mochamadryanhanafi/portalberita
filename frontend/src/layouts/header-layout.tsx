@@ -81,12 +81,14 @@ function Header() {
                     Dashboard
                   </button>
                 )}
-                <button
-                  className="hidden md:inline-block rounded border border-slate-50 px-4 py-2 hover:bg-slate-500/25 active:scale-click"
-                  onClick={() => navigate('/add-blog')}
-                >
-                  Create news
-                </button>
+                {user?.role === Role.Admin && (
+                  <button
+                    className="hidden md:inline-block rounded border border-slate-50 px-4 py-2 hover:bg-slate-500/25 active:scale-click"
+                    onClick={() => navigate('/add-blog')}
+                  >
+                    Create news
+                  </button>
+                )}
                 <button
                   className="hidden md:inline-block rounded border border-slate-50 px-4 py-2 hover:bg-slate-500/25 active:scale-click"
                   onClick={handleLogout}
@@ -94,12 +96,14 @@ function Header() {
                   Logout
                 </button>
                 {/* Mobile Add Icon */}
-                <button
-                  className="md:hidden px-2 py-2 hover:bg-slate-500/25"
-                  onClick={() => navigate('/add-blog')}
-                >
-                  <img src={AddIcon} alt="Add Icon" className="h-10 w-10" />
-                </button>
+                {user?.role === Role.Admin && (
+                  <button
+                    className="md:hidden px-2 py-2 hover:bg-slate-500/25"
+                    onClick={() => navigate('/add-blog')}
+                  >
+                    <img src={AddIcon} alt="Add Icon" className="h-10 w-10" />
+                  </button>
+                )}
               </div>
             ) : (
               <div className="flex items-center gap-2">

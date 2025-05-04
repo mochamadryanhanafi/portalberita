@@ -38,16 +38,13 @@ function FormBlog({ type, postId, post }: FormBlogPropType) {
       title: post?.title || '',
       authorName: post?.authorName || '',
       imageLink: post?.imageLink || '',
-      midImageLink: post?.midImageLink || '',
-      quote: post?.quote || '',
       categories: post?.categories || [],
       description: post?.description || '',
       isFeaturedPost: false,
-      template: post?.template || 'standard',
+      template: 'standard',
     },
   });
   const formData = watch();
-  const [selectedTemplate, setSelectedTemplate] = useState<string>(post?.template || 'standard');
   const handleImageSelect = (imageUrl: string) => {
     setSelectedImage(imageUrl);
   };
@@ -80,13 +77,6 @@ function FormBlog({ type, postId, post }: FormBlogPropType) {
   };
   const handleCheckboxChange = () => {
     setValue('isFeaturedPost', !formData.isFeaturedPost);
-  };
-  
-  // Handle template change
-  const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const template = e.target.value;
-    setSelectedTemplate(template);
-    setValue('template', template);
   };
   
   const onSumbit = async () => {
@@ -163,21 +153,7 @@ function FormBlog({ type, postId, post }: FormBlogPropType) {
           </h2>
         </div>
       </div>
-      {/* Template Selection */}
-      <div className="flex justify-center mb-6">
-        <div className="w-full sm:w-5/6 lg:w-2/3">
-          <label className="block mb-2 text-base font-medium text-light-secondary dark:text-dark-secondary">Choose News Template <Asterisk /></label>
-          <select
-            className="w-full rounded-lg border border-gray-300 bg-slate-200 p-2 dark:bg-dark-field dark:text-dark-textColor dark:border-gray-700"
-            value={selectedTemplate}
-            onChange={handleTemplateChange}
-          >
-            <option value="standard">Standard</option>
-            <option value="image-middle">Image in Middle</option>
-            <option value="quote-start">Quote at Start</option>
-          </select>
-        </div>
-      </div>
+
       <div className="flex justify-center">
         <form onSubmit={handleSubmit(onSumbit)} className="sm:w-5/6 lg:w-2/3">
           <div className="mb-2 flex items-center">
@@ -228,44 +204,6 @@ function FormBlog({ type, postId, post }: FormBlogPropType) {
             )}
           </div>
 
-          <div className="mb-1">
-            {selectedTemplate === 'image-middle' && (
-              <div className="mb-1">
-                <div className="px-2 py-1 font-medium text-light-secondary dark:text-dark-secondary">
-                  Optional image in the middle of the paragraph
-                </div>
-                <input
-                  {...register('midImageLink')}
-                  type="url"
-                  placeholder="https://... (jpg/png/webp)"
-                  autoComplete="off"
-                  className="dark:text-textInField mb-1 w-full rounded-lg bg-slate-200 p-3 placeholder:text-sm placeholder:text-light-tertiary dark:bg-dark-field dark:text-dark-textColor dark:placeholder:text-dark-tertiary"
-                  value={formData.midImageLink}
-                />
-                {errors.midImageLink && (
-                  <span className="p-2 text-sm text-red-500">{`${errors.midImageLink.message}`}</span>
-                )}
-              </div>
-            )}
-            {selectedTemplate === 'quote-start' && (
-              <div className="mb-1">
-                <div className="px-2 py-1 font-medium text-light-secondary dark:text-dark-secondary">
-                  Large quote at the start
-                </div>
-                <input
-                  {...register('quote')}
-                  type="text"
-                  placeholder="Add a quote..."
-                  autoComplete="off"
-                  className="dark:text-textInField mb-1 w-full rounded-lg bg-slate-200 p-3 placeholder:text-sm placeholder:text-light-tertiary dark:bg-dark-field dark:text-dark-textColor dark:placeholder:text-dark-tertiary"
-                  value={formData.quote}
-                />
-                {errors.quote && (
-                  <span className="p-2 text-sm text-red-500">{`${errors.quote.message}`}</span>
-                )}
-              </div>
-            )}
-          </div>
           <div className="mb-2">
             <div className="px-2 py-1 font-medium text-light-secondary dark:text-dark-secondary">
               Author name <Asterisk />
@@ -362,36 +300,12 @@ function FormBlog({ type, postId, post }: FormBlogPropType) {
       <div className="my-6">
         <div className="font-semibold mb-2 text-light-secondary dark:text-dark-secondary">Live Preview</div>
         <div className="border rounded-lg p-4 bg-white dark:bg-dark-field">
-          {selectedTemplate === 'standard' && (
-            <div>
-              <h2 className="text-xl font-bold mb-2">{formData.title}</h2>
-              <p className="mb-2">{formData.description}</p>
-              <img src={formData.imageLink} alt="cover" className="w-full max-h-60 object-cover rounded mb-2" />
-              <div className="text-sm text-gray-500">By {formData.authorName}</div>
-            </div>
-          )}
-          {selectedTemplate === 'image-middle' && (
-            <div>
-              <h2 className="text-xl font-bold mb-2">{formData.title}</h2>
-              <p className="mb-2">{formData.description}</p>
-              {formData.midImageLink && (
-                <img src={formData.midImageLink} alt="middle" className="w-full max-h-60 object-cover rounded mb-2" />
-              )}
-              <img src={formData.imageLink} alt="cover" className="w-full max-h-60 object-cover rounded mb-2" />
-              <div className="text-sm text-gray-500">By {formData.authorName}</div>
-            </div>
-          )}
-          {selectedTemplate === 'quote-start' && (
-            <div>
-              <h2 className="text-xl font-bold mb-2">{formData.title}</h2>
-              {formData.quote && (
-                <blockquote className="text-3xl font-serif text-purple-700 mb-2">“{formData.quote}”</blockquote>
-              )}
-              <p className="mb-2">{formData.description}</p>
-              <img src={formData.imageLink} alt="cover" className="w-full max-h-60 object-cover rounded mb-2" />
-              <div className="text-sm text-gray-500">By {formData.authorName}</div>
-            </div>
-          )}
+          <div>
+            <h2 className="text-xl font-bold mb-2">{formData.title}</h2>
+            <p className="mb-2">{formData.description}</p>
+            <img src={formData.imageLink} alt="cover" className="w-full max-h-60 object-cover rounded mb-2" />
+            <div className="text-sm text-gray-500">By {formData.authorName}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -399,4 +313,3 @@ function FormBlog({ type, postId, post }: FormBlogPropType) {
 }
 
 export default FormBlog;
-
