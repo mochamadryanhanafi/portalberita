@@ -9,6 +9,7 @@ import SignUp from '@/pages/signup-page';
 import AdminUsers from '@/pages/admin-users';
 import AdminBlogs from '@/pages/admin-blogs';
 import AdminComments from '@/pages/admin-comments';
+import AdminBanners from '@/pages/admin-banners';
 import NotFound from '@/pages/not-found';
 import UnprotectedRoute from './components/unprotected-route';
 import { useLayoutEffect } from 'react';
@@ -46,6 +47,7 @@ function App() {
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="blogs" element={<AdminBlogs />} />
                 <Route path="comments" element={<AdminComments />} />
+                <Route path="banners" element={<AdminBanners />} />
               </Route>
             </Route>
           </Route>

@@ -84,6 +84,29 @@ const AdminSidebar = () => {
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg> Comments
           </NavLink>
+          <NavLink
+            to={'/admin/banners'}
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-xl bg-light px-3 py-[10px] text-sm font-medium text-light-title dark:bg-dark dark:text-dark-title ${
+                isActive && '!dark:text-dark-title !bg-black !text-dark-title dark:!bg-dark-card '
+              }`
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="2" y="6" width="20" height="12" rx="2" />
+              <path d="M12 12h.01" />
+            </svg> Banners
+          </NavLink>
         </div>
       </div>
     </>

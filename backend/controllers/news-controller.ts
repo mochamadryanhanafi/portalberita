@@ -50,17 +50,13 @@ export const fetchNewsFromAPI = async (req: Request, res: Response) => {
 const mapNewsAPICategoryToLocal = (newsAPICategory: string): string => {
   const categoryMap: Record<string, string> = {
     general: 'other',
-    politik: 'Politik',
-    ekonomi: 'Ekonomi & Bisnis',
-    teknologi: 'Teknologi',
-    olahraga: 'Olahraga',
-    hiburan: 'Hiburan',
-    business: 'Ekonomi & Bisnis',
-    sports: 'Olahraga',
-    technology: 'Teknologi',
-    entertainment: 'Hiburan',
-    health: 'other',
-    science: 'other',
+    politik: 'politik',
+    ekonomi: 'ekonomi',
+    teknologi: 'teknologi',
+    hiburan: 'hiburan',
+    business: 'business',
+    health: 'health',
+    science: 'science',
   };
   
   return categoryMap[newsAPICategory.toLowerCase()] || 'other';

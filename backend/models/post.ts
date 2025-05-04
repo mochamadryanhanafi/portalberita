@@ -9,6 +9,7 @@ interface PostDocument extends Document {
   isFeaturedPost: boolean;
   timeOfPost: Date;
   authorId: Schema.Types.ObjectId;
+  viewCount: number;
 }
 
 const postSchema = new Schema<PostDocument>(
@@ -21,6 +22,7 @@ const postSchema = new Schema<PostDocument>(
     isFeaturedPost: { type: Boolean, default: false },
     timeOfPost: { type: Date, default: Date.now },
     authorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    viewCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

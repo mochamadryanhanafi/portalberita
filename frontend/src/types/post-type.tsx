@@ -7,6 +7,8 @@ type Post = {
   description: string;
   categories: string[];
   authorId?: string;
+  template?: string;
+  viewCount?: number;
 };
 
 export default Post;

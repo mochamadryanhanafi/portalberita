@@ -95,21 +95,9 @@ export const getPostByCategoryHandler = async (req: Request, res: Response) => {
         .json({ message: RESPONSE_MESSAGES.POSTS.INVALID_CATEGORY });
     }
 
-    console.log(`Searching for posts with category: ${category}`);
     const categoryPosts = await Post.find({ categories: category });
-    console.log(`Found ${categoryPosts.length} posts for category: ${category}`);
-    
-    // If no posts found for this category, return empty array with a message
-    if (categoryPosts.length === 0) {
-      return res.status(HTTP_STATUS.OK).json({
-        message: `No posts found for category: ${category}`,
-        posts: []
-      });
-    }
-    
     res.status(HTTP_STATUS.OK).json(categoryPosts);
   } catch (err: any) {
-    console.error(`Error getting posts for category ${category}:`, err);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: err.message });
   }
 };
@@ -126,6 +114,7 @@ export const getLatestPostsHandler = async (req: Request, res: Response) => {
 
 export const getPostByIdHandler = async (req: Request, res: Response) => {
   try {
+    // First find the post without updating to check if it exists
     const post = await Post.findById(req.params.id);
 
     // Validation - check if post exists
@@ -133,7 +122,15 @@ export const getPostByIdHandler = async (req: Request, res: Response) => {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: RESPONSE_MESSAGES.POSTS.NOT_FOUND });
     }
 
-    res.status(HTTP_STATUS.OK).json(post);
+    // Use findByIdAndUpdate to atomically increment the view count by exactly 1
+    // This ensures the count is only incremented once per request
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { viewCount: 1 } },
+      { new: true }
+    );
+
+    res.status(HTTP_STATUS.OK).json(updatedPost);
   } catch (err: any) {
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: err.message });
   }

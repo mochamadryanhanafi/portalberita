@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 import axiosInstance from '@/helpers/axios-instance';
 import userState from '@/utils/user-state';
 import ThemeToggle from '@/components/theme-toggle-button';
-import LoginForm from '@/components/login-form';
 import { useEffect, useRef } from 'react';
 
 function signin() {
@@ -60,14 +59,14 @@ function signin() {
       <div className="m-4 mb-4 flex justify-center">
         <div className="flex w-full items-center justify-center">
           <h2 className="w-2/4 pl-2 text-center text-lg font-bold text-black dark:text-dark-primary sm:text-xl md:w-3/4 md:pl-48">
-            Sign in to Wanderlust
+            Sign in to Winnicode
           </h2>
           <div className="flex items-center justify-end px-4 sm:px-20">
             <ThemeToggle />
           </div>
         </div>
       </div>
-      <div className="m-2 mt-8 flex flex-col items-center justify-center gap-6">
+      <div className="m-2 mt-8 flex flex-col items-center justify-center gap-2">
         <div className="mt-2 flex w-5/6 flex-col items-center justify-center gap-4 text-center text-sm font-normal dark:text-dark-primary sm:text-base">
           <p>
             Don't have an account?
@@ -76,24 +75,14 @@ function signin() {
             </Link>
           </p>
         </div>
-        
-        <div className="w-full md:w-3/4 lg:w-2/5">
-          <LoginForm className="mb-6" />
-          
-          <div className="my-4 flex items-center justify-center">
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-            <span className="mx-4 text-sm text-gray-500 dark:text-gray-400">OR</span>
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-          </div>
-          
-          <button
-            className="flex w-full items-center justify-center space-x-2 rounded-lg border-2 border-b-4 border-gray-300 p-3 text-center hover:bg-gray-50 dark:border-gray-700 dark:text-dark-primary dark:hover:bg-gray-700"
-            onClick={handleGoogleLogin}
-          >
-            <img className="h-4 w-6 pl-1 sm:h-5 sm:w-10" src={AddGoogleIcon} />
-            <span className="text-sm sm:text-base">Continue with Google</span>
-          </button>
-        </div>
+
+        <button
+          className="flex w-full items-center justify-center space-x-2 rounded-lg border-2 border-b-4 border-gray-300 p-3 text-center hover:bg-gray-50 dark:border-gray-700 dark:text-dark-primary dark:hover:bg-gray-700 md:w-3/4 lg:w-2/5"
+          onClick={handleGoogleLogin}
+        >
+          <img className="h-4 w-6 pl-1 sm:h-5 sm:w-10" src={AddGoogleIcon} />
+          <span className="text-sm sm:text-base">Continue with Google</span>
+        </button>
       </div>
     </div>
   );

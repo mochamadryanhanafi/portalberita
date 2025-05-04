@@ -59,14 +59,12 @@ const ProfilePage = () => {
 
   const removeFromFavorites = async (postId: string) => {
     try {
-      const response = await axiosInstance.delete(`/api/favorites/${postId}`);
-      if (response.data.success) {
-        setFavorites(favorites.filter(post => post._id !== postId));
-        // Also update saved list if the same post exists there
-        setSaved(saved.filter(post => post._id !== postId));
-        toast.success('Removed from favorites');
-        setRefreshData(prev => !prev); // Trigger a refresh of the data
-      }
+      await axiosInstance.delete(`/api/favorites/${postId}`);
+      setFavorites(favorites.filter(post => post._id !== postId));
+      // Also update saved list if the same post exists there
+      setSaved(saved.filter(post => post._id !== postId));
+      toast.success('Removed from favorites');
+      setRefreshData(prev => !prev); // Trigger a refresh of the data
     } catch (error) {
       console.error('Error removing from favorites:', error);
       toast.error('Failed to remove from favorites');
@@ -76,14 +74,12 @@ const ProfilePage = () => {
   const removeFromSaved = async (postId: string) => {
     try {
       // Since the saved endpoint doesn't exist, use the regular favorites endpoint
-      const response = await axiosInstance.delete(`/api/favorites/${postId}`);
-      if (response.data.success) {
-        setSaved(saved.filter(post => post._id !== postId));
-        // Also update favorites list if the same post exists there
-        setFavorites(favorites.filter(post => post._id !== postId));
-        toast.success('Removed from saved articles');
-        setRefreshData(prev => !prev); // Trigger a refresh of the data
-      }
+      await axiosInstance.delete(`/api/favorites/${postId}`);
+      setSaved(saved.filter(post => post._id !== postId));
+      // Also update favorites list if the same post exists there
+      setFavorites(favorites.filter(post => post._id !== postId));
+      toast.success('Removed from saved articles');
+      setRefreshData(prev => !prev); // Trigger a refresh of the data
     } catch (error) {
       console.error('Error removing from saved articles:', error);
       toast.error('Failed to remove from saved articles');

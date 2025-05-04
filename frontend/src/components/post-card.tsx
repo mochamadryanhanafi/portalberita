@@ -1,66 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import Post from '@/types/post-type';
 import formatPostTime from '@/utils/format-post-time';
 import CategoryPill from '@/components/category-pill';
 import { createSlug } from '@/utils/slug-generator';
 import { TestProps } from '@/types/test-props';
-import axiosInstance from '@/helpers/axios-instance';
-import useAuthData from '@/hooks/useAuthData';
-import { toast } from 'react-toastify';
 
 export default function PostCard({ post, testId = 'postcard' }: { post: Post } & TestProps) {
   const navigate = useNavigate();
   const slug = createSlug(post.title);
-  const { token } = useAuthData();
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  useEffect(() => {
-    // Check if the post is already in favorites when component mounts
-    if (token) {
-      checkIsFavorite();
-    }
-  }, [token, post._id]);
-
-  const checkIsFavorite = async () => {
-    try {
-      const response = await axiosInstance.get(`/api/favorites/check/${post._id}`);
-      if (response.data.success) {
-        setIsFavorite(response.data.isFavorite);
-      }
-    } catch (error) {
-      console.error('Error checking favorite status:', error);
-    }
-  };
-
-  const toggleFavorite = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent navigation to details page
-    
-    if (!token) {
-      toast.info('Please sign in to save articles');
-      navigate('/signin');
-      return;
-    }
-
-    try {
-      if (isFavorite) {
-        const response = await axiosInstance.delete(`/api/favorites/${post._id}`);
-        if (response.data.success) {
-          setIsFavorite(false);
-          toast.success('Removed from saved articles');
-        }
-      } else {
-        const response = await axiosInstance.post('/api/favorites', { newsId: post._id });
-        if (response.data.success) {
-          setIsFavorite(true);
-          toast.success('Article saved successfully');
-        }
-      }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-      toast.error('Failed to save article. Please try again.');
-    }
-  };
 
   return (
     <div
@@ -71,20 +18,6 @@ export default function PostCard({ post, testId = 'postcard' }: { post: Post } &
         className={`mb-4 cursor-pointer rounded-lg bg-light shadow-md dark:bg-dark-card ${'sm:mr-8 sm:mt-4'} relative`}
         onClick={() => navigate(`/details-page/${slug}/${post._id}`, { state: { post } })}
       >
-        <button 
-          onClick={toggleFavorite}
-          className="absolute right-2 top-2 z-10 rounded-full bg-white p-1.5 shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-          title={isFavorite ? "Remove from saved" : "Save article"}
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className={`h-5 w-5 ${isFavorite ? 'text-blue-500' : 'text-gray-500'}`} 
-            viewBox="0 0 20 20" 
-            fill="currentColor"
-          >
-            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-          </svg>
-        </button>
         <div className="h-48 w-full overflow-hidden">
           <img
             src={post.imageLink}
@@ -93,8 +26,17 @@ export default function PostCard({ post, testId = 'postcard' }: { post: Post } &
           />
         </div>
         <div className="p-3">
-          <div className="mb-1 text-xs text-light-info dark:text-dark-info">
-            {post.authorName} • {formatPostTime(post.timeOfPost)}
+          <div className="mb-1 flex justify-between text-xs text-light-info dark:text-dark-info">
+            <div>
+              {post.authorName} • {formatPostTime(post.timeOfPost)}
+            </div>
+            <div className="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span>{post.viewCount || 0}</span>
+            </div>
           </div>
           <h2 className="mb-2 line-clamp-1 text-base font-semibold text-light-title dark:text-dark-title">
             {post.title}

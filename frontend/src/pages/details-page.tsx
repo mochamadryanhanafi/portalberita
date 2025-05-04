@@ -4,7 +4,7 @@ import arrowRightWhiteIcon from '@/assets/svg/arrow-right-white.svg';
 import arrowRightBlackIcon from '@/assets/svg/arrow-right-black.svg';
 import formatPostTime from '@/utils/format-post-time';
 import CategoryPill from '@/components/category-pill';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import Post from '@/types/post-type';
 import axiosInstance from '@/helpers/axios-instance';
@@ -17,12 +17,13 @@ import TrasnIcon from '@/assets/svg/trash-icon';
 import { toast } from 'react-toastify';
 import useAuthData from '@/hooks/useAuthData';
 import CommentSection from '@/components/CommentSection';
+import { DetailsPageSkeleton } from '@/components/skeletons/details-page-skeleton';
+import BannerAd from '@/components/banner-ad';
 
 export default function DetailsPage() {
   const { state } = useLocation();
-  const [post, setPost] = useState<Post>(state?.post);
-  const initialVal = post === undefined;
-  const [loading, setIsLoading] = useState(initialVal);
+  const [post, setPost] = useState<Post | null>(state?.post || null);
+  const [loading, setIsLoading] = useState(true);
   const { postId } = useParams();
   const navigate = useNavigate();
   const [relatedCategoryPosts, setRelatedCategoryPosts] = useState<Post[]>([]);
@@ -43,6 +44,13 @@ export default function DetailsPage() {
       checkIsFavorite();
     }
   }, [userData.token, postId]);
+  
+  // Fetch post data when component mounts or postId changes
+  useEffect(() => {
+    if (postId) {
+      getPostById();
+    }
+  }, [postId]);
 
   const checkIsFavorite = async () => {
     try {
@@ -64,17 +72,13 @@ export default function DetailsPage() {
 
     try {
       if (isFavorite) {
-        const response = await axiosInstance.delete(`/api/favorites/${postId}`);
-        if (response.data.success) {
-          setIsFavorite(false);
-          toast.success('Removed from saved articles');
-        }
+        await axiosInstance.delete(`/api/favorites/${postId}`);
+        setIsFavorite(false);
+        toast.success('Removed from saved articles');
       } else {
-        const response = await axiosInstance.post('/api/favorites', { newsId: postId });
-        if (response.data.success) {
-          setIsFavorite(true);
-          toast.success('Article saved successfully');
-        }
+        await axiosInstance.post('/api/favorites', { newsId: postId });
+        setIsFavorite(true);
+        toast.success('Article saved successfully');
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
@@ -101,24 +105,23 @@ export default function DetailsPage() {
     }
   };
 
-  useEffect(() => {
-    const getPostById = async () => {
-      try {
-        await axios.get(import.meta.env.VITE_API_PATH + `/api/posts/${postId}`).then((response) => {
-          setIsLoading(false);
-          setPost(response.data);
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    if (post === undefined || post !== state.post) {
-      getPostById();
+  const getPostById = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(import.meta.env.VITE_API_PATH + `/api/posts/${postId}`);
+      setPost(response.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching post:', error);
+      toast.error('Failed to load article');
+      setIsLoading(false);
     }
-  }, [state.post]);
+  }, [postId]);
 
   useEffect(() => {
     const fetchRelatedCategoryPosts = async () => {
+      if (!post || !post.categories || post.categories.length === 0) return;
+      
       try {
         setRelatedPostsLoading(true);
         const res = await axiosInstance.get('/api/posts/related-posts-by-category', {
@@ -129,14 +132,35 @@ export default function DetailsPage() {
         setRelatedCategoryPosts(res.data);
         setRelatedPostsLoading(false);
       } catch (err) {
+        console.error('Error fetching related posts:', err);
         setRelatedPostsLoading(false);
       }
     };
     fetchRelatedCategoryPosts();
-  }, [post.categories]);
+  }, [post?.categories]);
 
-  if (!loading)
+  if (loading) {
+    return <DetailsPageSkeleton />;
+  }
+  
+  if (!post) {
     return (
+      <div className="flex-grow flex items-center justify-center bg-light dark:bg-dark">
+        <div className="text-center p-8">
+          <h2 className="text-2xl font-semibold mb-4 dark:text-white">Article Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">The article you're looking for doesn't exist or has been removed.</p>
+          <button 
+            onClick={() => navigate('/')} 
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
       <div className="flex-grow bg-light dark:bg-dark">
         <div className="relative flex flex-col">
           <img src={post.imageLink} alt={post.title} className="h-80 w-full object-cover sm:h-96" />
@@ -151,22 +175,7 @@ export default function DetailsPage() {
 
             <div className="flex gap-4">
               {/* Save Button */}
-              <button 
-                onClick={toggleFavorite}
-                className="rounded-full bg-white p-1.5 shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                title={isFavorite ? "Remove from saved" : "Save article"}
-              >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className={`h-5 w-5 ${isFavorite ? 'text-blue-500' : 'text-gray-500'}`} 
-                  viewBox="0 0 20 20" 
-                  fill="currentColor"
-                >
-                  <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                </svg>
-              </button>
-              
-              {(post?.authorId === userData?._id || userData?.role === 'ADMIN') && (
+              {userData?.role === 'ADMIN' && (
                 <>
                   <button onClick={handleDeleteClick}>
                     <TrasnIcon />
@@ -193,20 +202,101 @@ export default function DetailsPage() {
             </p>
           </div>
         </div>
-        <div className="mx-auto flex max-w-4xl flex-col items-center gap-y-4 px-4 py-10">
-          <div className="w-full">
-            {post.description.split('\n').map((paragraph, index) => (
-              paragraph.trim() ? (
-                <p key={index} className="mb-4 leading-7 text-light-secondary dark:text-dark-secondary sm:text-lg">
-                  {paragraph}
-                </p>
-              ) : <br key={index} />
-            ))}
+
+        {/* Main content with sidebars */}
+        <div className="relative mx-auto max-w-7xl px-4 py-10">
+          <div className="flex flex-col lg:flex-row lg:gap-8">
+            {/* Left sidebar - only visible on large screens */}
+            <div className="hidden lg:block lg:w-1/6 sticky top-24 self-start">
+              <BannerAd position="sidebar_left" />
+            </div>
+
+            {/* Main content */}
+            <div className="w-full lg:w-4/6">
+              <div className="w-full">
+                {post.template === 'image-middle' && post.midImageLink ? (
+                  (() => {
+                    const paragraphs = post.description.split('\n');
+                    const midIndex = Math.floor(paragraphs.length / 2);
+                    // Fallback: If there are no paragraphs or midImageLink is missing, render image below
+                    if (!paragraphs.length || !post.midImageLink) {
+                      return (
+                        <>
+                          {paragraphs.map((paragraph, index) => (
+                            paragraph.trim() ? (
+                              <p key={index} className="mb-4 leading-7 text-light-secondary dark:text-dark-secondary sm:text-lg">
+                                {paragraph}
+                              </p>
+                            ) : <br key={index} />
+                          ))}
+                          <img
+                            src={post.midImageLink}
+                            alt="middle"
+                            className="w-full max-h-60 object-cover rounded mb-6"
+                          />
+                        </>
+                      );
+                    }
+                    return (
+                      <>
+                        {paragraphs.map((paragraph, index) => (
+                          <>
+                            {index === midIndex && (
+                              <img
+                                src={post.midImageLink}
+                                alt="middle"
+                                className="w-full max-h-60 object-cover rounded mb-6"
+                              />
+                            )}
+                            {paragraph.trim() ? (
+                              <p key={index} className="mb-4 leading-7 text-light-secondary dark:text-dark-secondary sm:text-lg">
+                                {paragraph}
+                              </p>
+                            ) : <br key={index} />}
+                          </>
+                        ))}
+                      </>
+                    );
+                  })()
+                ) : post.template === 'quote-start' && post.quote ? (
+                  <>
+                    <blockquote className="mb-6 border-l-4 border-purple-400 pl-4 italic text-lg text-gray-700 dark:text-gray-300">
+                      {post.quote}
+                    </blockquote>
+                    {post.description.split('\n').map((paragraph, index) => (
+                      paragraph.trim() ? (
+                        <p key={index} className="mb-4 leading-7 text-light-secondary dark:text-dark-secondary sm:text-lg">
+                          {paragraph}
+                        </p>
+                      ) : <br key={index} />
+                    ))}
+                  </>
+                ) : (
+                  post.description.split('\n').map((paragraph, index) => (
+                    paragraph.trim() ? (
+                      <p key={index} className="mb-4 leading-7 text-light-secondary dark:text-dark-secondary sm:text-lg">
+                        {paragraph}
+                      </p>
+                    ) : <br key={index} />
+                  ))
+                )}
+              </div>
+
+              {/* Comment Section */}
+              <CommentSection newsId={postId || ''} />
+            </div>
+
+            {/* Right sidebar - only visible on large screens */}
+            <div className="hidden lg:block lg:w-1/6 sticky top-24 self-start">
+              <BannerAd position="sidebar_right" />
+            </div>
           </div>
         </div>
         
-        {/* Comment Section */}
-        <CommentSection newsId={postId || ''} />
+        {/* Mobile banner - only visible on small/medium screens */}
+        <div className="block lg:hidden px-4">
+          <BannerAd position="sidebar" />
+        </div>
         
         <div className="container mx-auto flex flex-col space-y-2 px-4 py-6 dark:text-white">
           <div className="flex justify-between text-2xl font-semibold ">
@@ -243,5 +333,4 @@ export default function DetailsPage() {
         </div>
       </div>
     );
-  else return <h1>Loading...</h1>;
 }

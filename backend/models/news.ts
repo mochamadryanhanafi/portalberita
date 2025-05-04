@@ -45,7 +45,7 @@ const newsSchema = new Schema<NewsDocument>(
     category: {
       type: String,
       required: [true, 'News category is required'],
-      enum: ['Politik', 'Ekonomi & Bisnis', 'Teknologi', 'Olahraga', 'Hiburan', 'other'],
+      enum: ['politics', 'sports', 'technology', 'entertainment', 'business', 'health', 'science', 'other'],
     },
     publishedAt: {
       type: Date,

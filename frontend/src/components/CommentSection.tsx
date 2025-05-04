@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import useAuthData from '@/hooks/useAuthData';
 import formatPostTime from '@/utils/format-post-time';
 import UserAvatar from './UserAvatar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Comment {
   _id: string;
@@ -48,7 +49,7 @@ export default function CommentSection({ newsId }: CommentSectionProps) {
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userData) {
-      toast.error('Please sign in to comment');
+      toast.error('please login first');
       return;
     }
     if (!newComment.trim()) {
@@ -67,7 +68,7 @@ export default function CommentSection({ newsId }: CommentSectionProps) {
       toast.success('Comment added successfully');
     } catch (error) {
       console.error('Error posting comment:', error);
-      toast.error('Failed to post comment');
+      toast.error('please login first');
     }
   };
 
@@ -85,7 +86,33 @@ export default function CommentSection({ newsId }: CommentSectionProps) {
     }
   };
 
-  if (loading) return <div className="text-center py-4">Loading comments...</div>;
+  if (loading) {
+    return (
+      <div className="mt-8 max-w-4xl mx-auto px-4">
+        <div className="mb-6">
+          <Skeleton className="h-8 w-1/4 bg-slate-200 dark:bg-slate-700" />
+        </div>
+        
+        <div className="space-y-6">
+          {[1, 2, 3].map((idx) => (
+            <div key={idx} className="p-4 border rounded-lg dark:border-gray-700">
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center space-x-2">
+                  <Skeleton className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700" />
+                  <div>
+                    <Skeleton className="h-4 w-24 bg-slate-200 dark:bg-slate-700" />
+                    <Skeleton className="mt-1 h-3 w-16 bg-slate-200 dark:bg-slate-700" />
+                  </div>
+                </div>
+              </div>
+              <Skeleton className="h-4 w-full bg-slate-200 dark:bg-slate-700" />
+              <Skeleton className="mt-2 h-4 w-3/4 bg-slate-200 dark:bg-slate-700" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-8 max-w-4xl mx-auto px-4">

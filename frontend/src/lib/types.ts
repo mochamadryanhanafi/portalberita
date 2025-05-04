@@ -51,6 +51,9 @@ export const formBlogSchema = z.object({
   imageLink: z.string().refine((value) => isValidImageLink(value), {
     message: 'Hmm... Image link should end with .jpg, .jpeg, .webp, or .png.',
   }),
+  midImageLink: z.string().optional(),
+  quote: z.string().optional(),
+  template: z.string().default('standard'),
   categories: z
     .array(z.string())
     .min(1, {

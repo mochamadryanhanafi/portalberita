@@ -6,6 +6,7 @@ const categoryColors: CategoryColors = new Map([
   ['Teknologi', ['bg-yellow-200 dark:bg-yellow-900', 'bg-yellow-500/80']],
   ['Olahraga', ['bg-blue-200 dark:bg-blue-900', 'bg-blue-500/80']],
   ['Hiburan', ['bg-purple-200 dark:bg-purple-900', 'bg-purple-500/80']],
+  ['Olahraga', ['bg-red-200 dark:bg-red-900', 'bg-red-500/80']],
 ]);
 
 export const categories: string[] = Array.from(categoryColors.keys());
